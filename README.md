@@ -1,34 +1,56 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+https://shimablogs.com/spa-ssr-ssg-difference
+SSR SPA SSGの違い
+https://zenn.dev/luvmini511/articles/1523113e0dec58
+SSG と SSR で理解する Next.js のページレンダリング
 
-## Getting Started
+SSGはrequest時にserver上でrenderingを行うのではなくbuild時に事前にhtmlファイルをpre-rendering（事前描画）しておく
 
-First, run the development server:
+メリット
+* パフォーマンス向上
+* SEO対応
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+デメリット
+* ページ量が多いwebサイトには向かない（buildが遅くなる）
+* 更新頻度の高いサイトには不向き（データ更新ごとに再buildを行う）
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+SSGとSSRは併用できる
+# 1.SSG
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+静的なコンテンツに使用
+Document, Helpなど
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+# 2.SSG + Pre-fetch
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+静的なコンテンツを作成する際にデータベースからのデータを埋め込んで作成する（buildするタイミング）
+ブログ、商品一覧など
 
-## Learn More
+# 3.SSG + Client side fetching
 
-To learn more about Next.js, take a look at the following resources:
+SEOが必要ない場合に使用する
+最新データを使用するためにjsでapiを取得して反映する
+Todo、Dashboadなど
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 4.SSG + Pre-fetch + Client side fetching
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+SEOが必要かつ最新データも必要なケース
+初期の内容としてbuild時の内容を返しその後apiで取得したデータで上書きする
+News siteなど
 
-## Deploy on Vercel
+ただしbuild時に使用されるデータは更新されない
+更新したい場合はISRを使用する
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Incremental Static Regeneration(State while revalidation)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+html再生成の時間を指定する -> revalidate
+※ 再生成が頻繁に行われないためのクールタイム（サーバーの負荷を減らすため）
+
+例: revalidate: 5[s]
+
+build(deploy) → DB update → アクセス　→ revalidate5[s] → 再生成完了
+
+DB update後にアクセスがあった際に新たなデータでhtmlが再生成される
+再生成中は古いhtmlを返す、その間新たなhtmlがserverで作成される
+
+サイトにある程度のユーザーからアクセスが頻繁にある前提の技術
+
+Todo, Dashboardなど
