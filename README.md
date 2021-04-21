@@ -2,6 +2,8 @@ https://shimablogs.com/spa-ssr-ssg-difference
 SSR SPA SSGの違い
 https://zenn.dev/luvmini511/articles/1523113e0dec58
 SSG と SSR で理解する Next.js のページレンダリング
+https://zenn.dev/catnose99/articles/8bed46fb271e44
+Next.jsのISRで動的コンテンツをキャッシュするときの戦略
 
 SSGはrequest時にserver上でrenderingを行うのではなくbuild時に事前にhtmlファイルをpre-rendering（事前描画）しておく
 
